@@ -23,17 +23,21 @@ let string_of_tokenlist tl =
 let string_of_frequencies fl =
   List.fold_left (fun s (t,n) -> s ^ ((string_of_token t) ^ " -> " ^ string_of_int n ^ "\n")) "" fl
 
-(* inc : 'a -> ('a * int) list -> ('a * int) list *)
-let rec inc t = function
-    [] -> [(t,1)]
-  | (t',n)::fl when t'=t -> (t',n+1)::fl
-  | x::fl -> x::(inc t fl)
 
-(* pref: int -> 'a list -> 'a list *)
-let rec pref n l = match l with
-    [] -> []
-  | _ when n=0 -> []
-  | x::l' -> x::(pref (n-1) l')
-  
+let rec inc (dict : (token * int) list) (t : token) : (token * int) list =
+  match dict with
+  | [] -> [(t,1)]
+  | (t',n)::dict' when t'=t -> (t,n+1)::dict'
+  | x::dict' -> x::(inc dict' t)
+
+let frequency1 tokenlist = List.fold_left inc [] tokenlist
+
+let rec take n = function
+| [] -> []
+| _ when n=0 -> []
+| x::t -> x::(take (n-1) t)
+
 (* frequency : int -> 'a list -> ('a * int) list *)
-let frequency n tl = pref n (List.sort (fun (_,n) (_,n') -> compare n' n) (List.fold_left (fun fl t -> inc t fl) [] tl))
+let frequency n tokenlist = frequency1 tokenlist
+  |> List.sort (fun (_,n1) (_,n2) -> compare n2 n1)
+  |> take n
