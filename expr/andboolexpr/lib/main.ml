@@ -43,7 +43,7 @@ let rec eval = function
   | False -> false
   | If(e0,e1,e2) -> if eval e0 then eval e1 else eval e2
   | Not(e) -> not (eval e)
-  | And(e1,e2) -> eval e1 && eval e2
-  | Or(e1,e2) -> eval e1 || eval e2
+  | And(e1,e2) -> if eval e1 then eval e2 else false
+  | Or(e1,e2) -> if eval e1 then true else eval e2
 
 ;;
